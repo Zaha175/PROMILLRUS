@@ -11,19 +11,19 @@
             line-height: 1.6;
             margin: 0;
             padding: 20px;
-            background-color: #add8e6; /* Светло-голубой */
+            background-color: #ffffe0; /* Светло-жёлтый */
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background-color: #fff;
+            background-color: #ffffe0; /* Светло-жёлтый */
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         h1 {
             text-align: center;
-            color: #00008b; /* Темно-синий */
+            color: #00008b; /* Тёмно-синий */
         }
         .form-group {
             margin-bottom: 15px;
@@ -43,7 +43,7 @@
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 1.2em; 
+            font-size: 1.2em;
         }
         .input-group .unit {
             min-width: 60px;
@@ -93,34 +93,7 @@
             font-weight: bold;
             display: none;
         }
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: help;
-        }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 200px;
-            background-color: #555;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -100px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        /* Светло-жёлтый фон для холста диаграммы */
-        canvas#bakChart {
+        canvas {
             background-color: #ffffe0; /* Светло-жёлтый */
         }
     </style>
@@ -130,9 +103,7 @@
         <h1>Калькулятор концентрации алкоголя в крови с диаграммой</h1>
         <form id="alcoholForm">
             <div class="form-group">
-                <label for="weight" class="tooltip">Вес
-                    <span class="tooltiptext">Введите ваш вес в килограммах.</span>
-                </label>
+                <label for="weight">Вес</label>
                 <div class="input-group">
                     <input type="number" id="weight" required min="30" max="200">
                     <span class="unit">кг</span>
@@ -140,9 +111,7 @@
             </div>
 
             <div class="form-group">
-                <label for="height" class="tooltip">Рост
-                    <span class="tooltiptext">Введите ваш рост в сантиметрах.</span>
-                </label>
+                <label for="height">Рост</label>
                 <div class="input-group">
                     <input type="number" id="height" required min="100" max="250">
                     <span class="unit">см</span>
@@ -150,9 +119,7 @@
             </div>
 
             <div class="form-group">
-                <label for="gender" class="tooltip">Пол
-                    <span class="tooltiptext">Выберите ваш биологический пол.</span>
-                </label>
+                <label for="gender">Пол</label>
                 <select id="gender" required>
                     <option value="male">Мужской</option>
                     <option value="female">Женский</option>
@@ -160,19 +127,15 @@
             </div>
 
             <div class="form-group">
-                <label for="duration" class="tooltip">Продолжительность употребления
-                    <span class="tooltiptext">Введите длительность употребления алкоголя в часах.</span>
-                </label>
+                <label for="duration">Длительность употребления</label>
                 <div class="input-group">
                     <input type="number" id="duration" required min="0" step="0.5">
-                    <span class="unit">часы</span>
+                    <span class="unit">часов</span>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="beerVolume" class="tooltip">Пиво
-                    <span class="tooltiptext">Введите количество выпитого пива в литрах.</span>
-                </label>
+                <label for="beerVolume">Пиво</label>
                 <div class="input-group">
                     <input type="number" id="beerVolume" min="0" step="0.1">
                     <span class="unit">литры</span>
@@ -180,9 +143,7 @@
             </div>
 
             <div class="form-group">
-                <label for="wineVolume" class="tooltip">Вино
-                    <span class="tooltiptext">Введите количество выпитого вина в литрах.</span>
-                </label>
+                <label for="wineVolume">Вино</label>
                 <div class="input-group">
                     <input type="number" id="wineVolume" min="0" step="0.1">
                     <span class="unit">литры</span>
@@ -190,9 +151,7 @@
             </div>
 
             <div class="form-group">
-                <label for="spiritsVolume" class="tooltip">Крепкие напитки
-                    <span class="tooltiptext">Введите количество выпитых крепких спиртных напитков и выберите единицу измерения.</span>
-                </label>
+                <label for="spiritsVolume">Крепкие напитки</label>
                 <div class="input-group">
                     <input type="number" id="spiritsVolume" min="0" step="0.001">
                     <select id="spiritsUnit">
@@ -217,10 +176,7 @@
     <script>
         let bakChart;
 
-        // Функции для более удобной структуры кода
-
         function calculateAlcoholGrams(beerVolume, wineVolume, spiritsVolume, spiritsUnit) {
-            // Содержание алкоголя в г/100 мл
             const beerAlcohol = 5;
             const wineAlcohol = 12;
             const spiritsAlcohol = 40;
@@ -238,56 +194,39 @@
                     break;
             }
 
-            // Расчёт общего количества алкоголя в граммах
-            const alcoholGrams = (beerVolume * 1000 * beerAlcohol / 100 * 0.8) +
-                                 (wineVolume * 1000 * wineAlcohol / 100 * 0.8) +
-                                 (spiritsLiters * 1000 * spiritsAlcohol / 100 * 0.8);
-            return alcoholGrams;
+            return (beerVolume * 1000 * beerAlcohol / 100 * 0.8) +
+                   (wineVolume * 1000 * wineAlcohol / 100 * 0.8) +
+                   (spiritsLiters * 1000 * spiritsAlcohol / 100 * 0.8);
         }
 
         function calculateDistributionFactor(weight, height, gender) {
-            // Расчёт фактора распределения по формуле Seidl et al.
-            let r;
             if (gender === 'male') {
-                r = 0.31608 - 0.004821 * weight + 0.004432 * height;
+                return 0.31608 - 0.004821 * weight + 0.004432 * height;
             } else {
-                r = 0.31223 - 0.006446 * weight + 0.004466 * height;
+                return 0.31223 - 0.006446 * weight + 0.004466 * height;
             }
-            return r;
         }
 
-        function calculateBAKData(duration, bakAtDuration) {
-            // Простой линейный рост: от 0 в начале до bakAtDuration к указанной длительности
+        function calculateBAK(alcoholGrams, weight, distributionFactor, duration) {
+            let bak = alcoholGrams / (weight * distributionFactor);
+            bak -= bak * 0.15; // Дефицит абсорбции
+
             const bakData = [];
             const timeLabels = [];
             const step = 0.5;
-            const steps = duration / step;
 
-            for (let i = 0; i <= steps; i++) {
-                const currentHour = i * step;
-                const currentBAK = (bakAtDuration / duration) * currentHour; 
-                bakData.push(currentBAK);
-                timeLabels.push(currentHour.toFixed(1));
+            for (let hour = 0; hour <= duration; hour += step) {
+                let bakAtTime = bak * (hour / duration); // Линейный рост
+                bakAtTime = Math.min(bak, bakAtTime); // Ограничение максимального значения
+                bakData.push(bakAtTime);
+                timeLabels.push(hour);
             }
 
-            return { timeLabels, bakData };
-        }
-
-        function showError(msg) {
-            const errorDiv = document.getElementById('errorMessages');
-            errorDiv.style.display = 'block';
-            errorDiv.innerHTML = msg;
-        }
-
-        function clearErrors() {
-            const errorDiv = document.getElementById('errorMessages');
-            errorDiv.style.display = 'none';
-            errorDiv.innerHTML = '';
+            return { bak, bakData, timeLabels };
         }
 
         document.getElementById('alcoholForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            clearErrors();
 
             const weight = parseFloat(document.getElementById('weight').value);
             const height = parseFloat(document.getElementById('height').value);
@@ -298,45 +237,21 @@
             const spiritsVolume = parseFloat(document.getElementById('spiritsVolume').value) || 0;
             const spiritsUnit = document.getElementById('spiritsUnit').value;
 
-            // Валидация входных данных
             if (!weight || !height || !duration) {
-                showError("Пожалуйста, заполните все обязательные поля (вес, рост, продолжительность).");
-                return;
-            }
-            if (weight < 30 || weight > 200 || height < 100 || height > 250) {
-                showError("Пожалуйста, введите реалистичные значения для веса и роста.");
-                return;
-            }
-            if (duration <= 0) {
-                showError("Продолжительность должна быть больше 0 часов.");
-                return;
-            }
-            if (beerVolume === 0 && wineVolume === 0 && spiritsVolume === 0) {
-                showError("Введите, по крайней мере, количество одного вида алкогольного напитка.");
-                return;
-            }
-            if (beerVolume > 20 || wineVolume > 20 || spiritsVolume > 20) {
-                showError("Введите реалистичные значения для количества потреблённого алкоголя.");
+                document.getElementById('errorMessages').textContent = "Пожалуйста, заполните все поля.";
                 return;
             }
 
             const alcoholGrams = calculateAlcoholGrams(beerVolume, wineVolume, spiritsVolume, spiritsUnit);
             const distributionFactor = calculateDistributionFactor(weight, height, gender);
 
-            // Теоретический расчёт концентрации алкоголя
-            let bak = alcoholGrams / (weight * distributionFactor);
-            bak -= bak * 0.15; // Дефицит резорбции
+            const { bak, bakData, timeLabels } = calculateBAK(alcoholGrams, weight, distributionFactor, duration);
 
-            const bakAtDuration = bak;
-
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = `
+            document.getElementById('result').innerHTML = `
                 <h2>Результат:</h2>
-                <p>Через ${duration} часов ваша концентрация алкоголя в крови составит: ${bakAtDuration.toFixed(2)} ‰</p>
-                <p><strong>Внимание:</strong> Данный расчёт носит ознакомительный характер и не заменяет медицинскую или юридическую оценку. Фактическая концентрация алкоголя в крови может отличаться.</p>
+                <p>Через ${duration} часов ваша концентрация алкоголя в крови составит: ${bakData[bakData.length - 1].toFixed(2)} ‰</p>
+                <p><strong>Внимание:</strong> Этот расчёт носит ознакомительный характер и не заменяет медицинскую или юридическую оценку. Фактическая концентрация алкоголя в крови может отличаться.</p>
             `;
-
-            const { timeLabels, bakData } = calculateBAKData(duration, bakAtDuration);
 
             if (bakChart) {
                 bakChart.destroy();
@@ -351,8 +266,7 @@
                         label: 'Концентрация алкоголя (‰)',
                         data: bakData,
                         borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1,
-                        fill: false
+                        tension: 0.1
                     }]
                 },
                 options: {
